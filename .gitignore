@@ -1,0 +1,8 @@
+.Python
+.pytest_cache/
+.tox/
+bin/
+*.egg-info/
+include/
+lib/
+**/__pycache__/
