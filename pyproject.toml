@@ -1,0 +1,5 @@
+[tool.portray.mkdocs.theme]
+name = "material"
+favicon = "art/logo.png"
+logo = "art/logo.png"
+palette = {primary = "black", accent = "gray"}
