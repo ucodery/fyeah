@@ -1,8 +1,11 @@
+**/__pycache__/
+*.egg-info/
+# Virtual envs
 .Python
+.python-version
+# Test output
 .pytest_cache/
 .tox/
-bin/
-*.egg-info/
-include/
-lib/
-**/__pycache__/
+# distutils and CPython artifacts
+build/
+dist/
