@@ -1,4 +1,6 @@
-# F-yeah!
+[![fyeah - reusable f-strings](https://raw.githubusercontent.com/ucodery/fyeah/master/art/logo.png)](https://github.com/ucodery/fyeah)
+------
+
 #### Reusable f-strings
 Shed all outdated format sytles from your code.
 With F-yeah Just add parentheses and be on your way.
