@@ -2,19 +2,43 @@
 ------
 
 #### Reusable f-strings
-Shed all outdated format sytles from your code.
+Unify on one format sytle.
 With F-yeah Just add parentheses and be on your way.
 
 ## Usage
-#### No more copying around f-strings
-Keep your templates DRY without reverting to older format styles.
+Keep using f-string formatting, but when you need to re-use a template, use the
+`f` function instead of the `f` listeral
+
+These two lines are equivalent
 ```python
-def action1(value):
+print(f'about to put {os.getpid()} to sleep')
+print(f('about to put {os.getpid()} to sleep'))
+# "about to put 421 to sleep"
+```
+
+No longer choose between copying around f-string literals or continuing to use
+old-style format() calls.
+
+Instead of this
+```python
+def mul(value):
     assert isinstance(value, int), 'Expected value to be an integer, got {type(value)} instead'
     return value * value
 
-def action2(value):
+def pow(value):
     assert isinstance(value, int), 'Expected value to be an integer, got {type(value)} instead'
+    return value ** value
+```
+Or this
+```python
+bad_check = 'expected value to be an integer, got {type(value)} instead'
+
+def mul(value):
+    assert isinstance(value, int), bad_check.format(value=value)
+    return value * value
+
+def pow(value):
+    assert isinstance(value, int), bad_check.format(value=value)
     return value ** value
 ```
 Just write the template once to get consistent strings that stay in sync.
@@ -22,38 +46,54 @@ Just write the template once to get consistent strings that stay in sync.
 from fyeah import f
 bad_check = 'Expected value to be an integer, got {type(value)} instead'
 
-def action1(value):
+def mul(value):
     assert isinstance(value, int), f(bad_check)
     return value * value
 
-def action2(value):
+def pow(value):
     assert isinstance(value, int), f(bad_check)
     return value ** value
 ```
-----
-#### No more format calls, ever!
-Consolidate on f-string style format for all templates, local or global.
+
+#### Why would I use a function over the literal?
+f-string literals are evaluated when they are created. This makes situations like the
+following impossible.
 ```python
-bad_check = 'expected value to be an integer, got {type(value)} instead'
+class BaseListRunner:
+    command = ['ls']
+    args = []
+    notify_running = '{self.__class__.__name__} is executing {self.command} with "{" ".join(self.args)}"'
 
-def action1(value):
-    assert isinstance(value, int), bad_check.format(value=value)
-    return value * value
+    def run(self):
+        log.debug(f(self.notify_running))
+        subprocess.call(self.command + args)
 
-def action2(value):
-    assert isinstance(value, int), bad_check.format(value=value)
-    return value ** value
+class AllListRunner:
+    def __init__(self):
+        self.args.append('-A')
+
+AllListRunner().run()
+# DEBUG: AllListRunnner is executing ls with "-A"
 ```
-Just use the same format string as a reusable f-string instead.
+
+#### Why would I use F-yeah instead of the format() builtin?
+Although the format mini-language and f-strings share a lot of syntax, they have
+divered somewhat. You could use only format() for all your strings, but format()
+is more verbose and less flexible as compared to f-strings; enough so that f-strings
+were adopted into the language. Using F-yeah makes the following possible.
 ```python
-from fyeah import f
-bad_check = 'Expected value to be an integer, got {type(value)} instead'
+G_COUNT = 0
+count_tracker = '{G_COUNT=} at {datetime.datetime.utcnow():%H:%M:%S}'
 
-def action1(value):
-    assert isinstance(value, int), f(bad_check)
-    return value * value
+def aquire():
+    G_COUNT += 1
+    log.debug(f(count_tracker))
 
-def action2(value):
-    assert isinstance(value, int), f(bad_check)
-    return value ** value
+def release():
+    G_COUNT -= 1
+    log.debug(f(count_tracker))
+
+def check():
+    log.debug(f(count_tracker))
+    return G_COUNT
 ```
