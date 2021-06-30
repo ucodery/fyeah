@@ -2,12 +2,12 @@
 ------
 
 #### Reusable f-strings
-Unify on one format sytle.
+Unify on one format style.
 With F-yeah Just add parentheses and be on your way.
 
 ## Usage
 Keep using f-string formatting, but when you need to re-use a template, use the
-`f` function instead of the `f` listeral
+`f` function instead of the `f` literal
 
 These two lines are equivalent
 ```python
@@ -78,14 +78,14 @@ AllListRunner().run()
 
 #### Why would I use F-yeah instead of the format() builtin?
 Although the format mini-language and f-strings share a lot of syntax, they have
-divered somewhat. You could use only format() for all your strings, but format()
+diverged somewhat. You could use only format() for all your strings, but format()
 is more verbose and less flexible as compared to f-strings; enough so that f-strings
 were adopted into the language. Using F-yeah makes the following possible.
 ```python
 G_COUNT = 0
 count_tracker = '{G_COUNT=} at {datetime.datetime.utcnow():%H:%M:%S}'
 
-def aquire():
+def acquire():
     G_COUNT += 1
     log.debug(f(count_tracker))
 

@@ -16,13 +16,17 @@ cmodule = Extension(
 
 setup(
     name="f-yeah",
-    version="0.1.5",
+    version="0.2.0",
     author="Jeremiah Paige",
     author_email="ucodery@gmail.com",
     python_requires=">=3.6, <3.9",
     packages=["fyeah"],
     ext_modules=[cmodule],
-    extras_require={"dev": ["tox",]},
+    extras_require={
+        "dev": [
+            "tox",
+        ]
+    },
     url="https://github.com/ucodery/fyeah",
     license="BSD",
     description="Reusable f-strings",
