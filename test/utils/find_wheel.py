@@ -10,7 +10,7 @@ wheels = os.listdir(search_dir)
 for tag in TargetPython().get_tags():
     for wheel in wheels:
         if str(tag) in wheel:
-            print(wheel)
+            print(os.path.join(search_dir, wheel))
             break
     else:
         continue

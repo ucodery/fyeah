@@ -1,7 +1,7 @@
 VPATH = fyeah:build
 FYEAH_MAKE := $(lastword $(MAKEFILE_LIST))
 
-PY = python
+PY = python3
 LONG_PYVER = $(shell $(PY) -V | grep -oE '[0-9.]+')
 SHORT_PYVER = $(basename $(LONG_PYVER))
 
@@ -60,8 +60,8 @@ ast.c:
 endif
 
 ensure:
-	$(PY) -m pip install --user --upgrade pip
-	$(PY) -m pip install --user --upgrade setuptools wheel twine tox
+	$(PY) -m pip install --upgrade pip
+	$(PY) -m pip install --upgrade setuptools wheel twine tox
 
 clean:
 	$(PY) setup.py clean --all
