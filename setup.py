@@ -19,7 +19,7 @@ setup(
     version="0.2.0",
     author="Jeremiah Paige",
     author_email="ucodery@gmail.com",
-    python_requires=">=3.6, <3.9",
+    python_requires=">=3.6, <3.11",
     packages=["fyeah"],
     ext_modules=[cmodule],
     extras_require={
@@ -36,6 +36,8 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
