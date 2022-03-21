@@ -8,10 +8,10 @@ SHORT_PYVER = $(basename $(LONG_PYVER))
 .PHONY: install package install_wheel audit manylinux all ensure clean test
 
 install: ast.c
-	$(PY) setup.py build install
+	$(PY) -m pip install .[dev]
 
 package: ast.c
-	$(PY) setup.py sdist bdist_wheel
+	$(PY) -m build
 
 install_wheel: package
 	$(PY) -m pip install `$(PY) ./test/utils/find_wheel.py ./dist/`

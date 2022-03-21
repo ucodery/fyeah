@@ -3,3 +3,7 @@ name = "material"
 favicon = "art/logo.png"
 logo = "art/logo.png"
 palette = {primary = "black", accent = "gray"}
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
