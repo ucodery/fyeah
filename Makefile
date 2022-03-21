@@ -7,6 +7,9 @@ SHORT_PYVER = $(basename $(LONG_PYVER))
 
 .PHONY: install package install_wheel audit manylinux all ensure clean test
 
+ML_PYTHONS:=$(foreach py,cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310,/opt/python/$(py)/bin/python)
+PYTHONS:=python3.6 python3.7 python3.8 python3.9 python3.10
+
 install: ast.c
 	$(PY) -m pip install .[dev]
 
@@ -21,10 +24,10 @@ audit: package
 	rm ./dist/*$(subst .,,$(SHORT_PYVER))*-linux_*.whl
 
 manylinux:
-	$(foreach py, /opt/python/cp36-cp36m/bin/python /opt/python/cp37-cp37m/bin/python /opt/python/cp38-cp38/bin/python, $(MAKE) -f $(FYEAH_MAKE) audit PY=$(py);)
+	$(foreach py, $(ML_PYTHONS), $(MAKE) -f $(FYEAH_MAKE) audit PY=$(py);)
 
 all:
-	$(foreach py, python3.6 python3.7 python3.8, $(MAKE) -f $(FYEAH_MAKE) package PY=$(py);)
+	$(foreach py, $(PYTHONS), $(MAKE) -f $(FYEAH_MAKE) package PY=$(py);)
 
 build:
 	mkdir ./build
