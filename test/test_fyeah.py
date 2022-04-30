@@ -146,7 +146,7 @@ def test_modifiable_var(f):
     assert formatted == final
 
 
-@pytest.mark.skip(reason="fails for _fyeah")
+@pytest.mark.xfail(reason="fails for _cfyeah")
 def test_outer_scopes_reachable(f):
     top = None
 
@@ -215,14 +215,13 @@ def test_nested_formats(f, template, final):
     assert f(template) == final
 
 
-@pytest.mark.skip(reason="fails for _fyeah")
 def test_nested_quotes(f):
     # this is the deepest level of quoting that can occur in an fstring expression
     # because backslashes are disallowed
     assert f('''" \'\'\'{"""'" "'"""}\'\'\' "''') == '''" \'\'\'\'" "\'\'\'\' "'''
-    # one additional layer of quoting is possible in fyeah because string
-    # concatination occurs before the functino call
-    # XXX only cfyeah assert f('''" \'\'\'{"""'"''' + "''' '''" + '"""}\'\'\' "''') == '''" \'\'\'" "\'\'\' "'''
+    assert f("""' \"\"\"{'''"' '"'''}\"\"\" '""") == """' \"\"\"\"' '\"\"\"\" '"""
+    assert f('''"'{"'"''"'"}'"''') == '''"\'\'\'\'"'''
+    assert f('''"""{" \'\'\' "}"""''') == '''""" \'\'\' """'''
 
 
 @pytest.mark.parametrize(
@@ -235,10 +234,12 @@ def test_nested_quotes(f):
         '{}',
         '{    }',
         '{\t}',
+        '{ \\ }'
         '{name# from global sapce}',
         "{name + 'uniquote}",
         '{name!x}',
         pytest.param('{ord("\n")}', marks=pytest.mark.xfail(reason='fails in _cfyeah')),
+        pytest.param(''' {""" \'\'\' \'\'\' """} ''', marks=pytest.mark.xfail(reason='fails in _cfyeah')),
     ],
 )
 def test_fstring_errors(f, error):
