@@ -16,10 +16,9 @@ cmodule = Extension(
 
 setup(
     name="f-yeah",
-    version="0.2.0",
+    version="0.3.0",
     author="Jeremiah Paige",
     author_email="ucodery@gmail.com",
-    python_requires=">=3.6, <3.9",
     packages=["fyeah"],
     ext_modules=[cmodule],
     extras_require={
