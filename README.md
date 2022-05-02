@@ -1,6 +1,10 @@
 [![fyeah - reusable f-strings](https://raw.githubusercontent.com/ucodery/fyeah/master/art/logo.png)](https://github.com/ucodery/fyeah)
 ------
 
+[![PyPI version](https://badge.fury.io/py/f-yeah.svg)](https://badge.fury.io/py/f-yeah)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://pypi.org/project/f-yeah/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 #### Reusable f-strings
 Unify on one format style.
 With F-yeah Just add parentheses and be on your way.
