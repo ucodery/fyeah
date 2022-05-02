@@ -234,60 +234,18 @@ def test_nested_quotes(f):
         '{}',
         '{    }',
         '{\t}',
-        '{ \\ }'
+        '{ \\ }',
         '{name# from global sapce}',
         "{name + 'uniquote}",
         '{name!x}',
         pytest.param('{ord("\n")}', marks=pytest.mark.xfail(reason='fails in _cfyeah')),
-        pytest.param(''' {""" \'\'\' \'\'\' """} ''', marks=pytest.mark.xfail(reason='fails in _cfyeah')),
+        pytest.param(
+            ''' {""" \'\'\' \'\'\' """} ''',
+            marks=pytest.mark.xfail(reason='fails in _cfyeah'),
+        ),
     ],
 )
 def test_fstring_errors(f, error):
     with pytest.raises(SyntaxError) as why:
         f(error)
     assert 'f-string' in why.exconly()
-
-
-@pytest.mark.parametrize(
-    'template,final',
-    [
-        ('', ''),
-        ('Hello World', 'Hello World'),
-        ('value: {s}', 'value: foo'),
-        ('value: {i}', 'value: 21'),
-        ('value: {j}', 'value: 3.14'),
-        ('value: {n}', 'value: None'),
-        ('value: {b}', 'value: True'),
-    ],
-)
-def test_compile_then_f(template, final):
-    b = True
-    i = 21
-    j = 3.14
-    n = None
-    s = 'foo'
-    comp = _fyeah.compile(template)
-    assert _fyeah.f(comp) == final
-
-
-@pytest.mark.parametrize(
-    'template,value,intermediate,value_changed,final',
-    [
-        ('value is: {value}', True, 'value is: True', False, 'value is: False'),
-    ],
-)
-def test_compile_once_use_many(template, value, intermediate, value_changed, final):
-    comp = _fyeah.compile(template)
-    assert _fyeah.f(comp) == intermediate
-    value = value_changed
-    assert _fyeah.f(comp) == final
-
-
-def test_cfyeah_compile_noop():
-    from fyeah import compile
-
-    value = True
-    start = "start with {value}"
-    end = compile(start)
-    assert start is end
-    assert _cfyeah.f(start) == _cfyeah.f(end)
