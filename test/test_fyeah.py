@@ -2,14 +2,12 @@ from collections import defaultdict
 
 import pytest
 
-from fyeah import _fyeah, _cfyeah
+from fyeah import f
 
 
-@pytest.fixture(params=[_fyeah, _cfyeah])
-def f(request):
-    """Run a test using both the native python and CPython implementations"""
-    yield request.param.f
-
+# fmt: off
+# ruff: noqa: F541
+# ruff: noqa: F841
 
 # Global vars for use in f-strings outside of test functions
 name = 'foo'
@@ -21,7 +19,7 @@ outside = 3.1
 
 
 @pytest.mark.parametrize('template', ['', 'Hello World'])
-def test_no_expressions(f, template):
+def test_no_expressions(template):
     assert f(template) == template
     assert f(f(template)) == template
     assert f(f(f(template))) == template
@@ -48,7 +46,7 @@ def test_no_expressions(f, template):
         (f"""Hello World""", 'Hello World'),
     ],
 )
-def test_str_prefixes_no_expressions(f, template, final):
+def test_str_prefixes_no_expressions(template, final):
     assert f(template) == final
 
 
@@ -62,7 +60,7 @@ def test_str_prefixes_no_expressions(f, template, final):
         ('value: {b}', 'value: True'),
     ],
 )
-def test_variable_insertion(f, template, final):
+def test_variable_insertion(template, final):
     b = True
     i = 21
     j = 3.14
@@ -81,7 +79,7 @@ def test_variable_insertion(f, template, final):
         ('value: {c * i}', 'value: aaaaaaaaaaaaaaaaaaaaa'),
     ],
 )
-def test_simple_expression(f, template, final):
+def test_simple_expression(template, final):
     b = True
     c = 'a'
     i = 21
@@ -102,11 +100,11 @@ def test_simple_expression(f, template, final):
         ("\"hello\" 'world'", '"hello" \'world\''),
     ],
 )
-def test_quotes(f, template, final):
+def test_quotes(template, final):
     assert f(template) == final
 
 
-def test_reformat_template(f):
+def test_reformat_template():
     template = 'Global name: {name}; Local name: {{name}}'
     first_format = f(template)
     assert first_format == 'Global name: foo; Local name: {name}'
@@ -118,19 +116,19 @@ def test_reformat_template(f):
 @pytest.mark.parametrize(
     'template,final', [('Hello World', 'Hello World'), ('Hello {name}', 'Hello foo')]
 )
-def test_recursive(f, template, final):
+def test_recursive(template, final):
     """Test that passing the same string, with no bracket pairs, through f produces no changes"""
     for _ in range(8):
         template = f(template)
         assert f(template) == final
 
 
-def test_f_scope_not_leaked(f):
+def test_f_scope_not_leaked():
     with pytest.raises(NameError):
         f('secret is {template}')
 
 
-def test_modifiable_var(f):
+def test_modifiable_var():
     explicit = [0, 1, 2, 3]
     implicit = defaultdict(int)
     formatted = f(
@@ -146,8 +144,7 @@ def test_modifiable_var(f):
     assert formatted == final
 
 
-@pytest.mark.xfail(reason="fails for _cfyeah")
-def test_outer_scopes_reachable(f):
+def test_outer_scopes_reachable():
     top = None
 
     def outer():
@@ -194,7 +191,7 @@ def test_outer_scopes_reachable(f):
     assert f('out: {outside}; top: {top}') == 'out: 24.8; top: True'
 
 
-def test_outer_scopes_modifiable(f):
+def test_outer_scopes_modifiable():
     explicit = [0, 1, 2, 3]
     implicit = defaultdict(int)
 
@@ -211,11 +208,11 @@ def test_outer_scopes_modifiable(f):
 
 
 @pytest.mark.parametrize('template,final', [('{name:*^{3+4}}', '**foo**')])
-def test_nested_formats(f, template, final):
+def test_nested_formats(template, final):
     assert f(template) == final
 
 
-def test_nested_quotes(f):
+def test_nested_quotes():
     # this is the deepest level of quoting that can occur in an fstring expression
     # because backslashes are disallowed
     assert f('''" \'\'\'{"""'" "'"""}\'\'\' "''') == '''" \'\'\'\'" "\'\'\'\' "'''
@@ -238,14 +235,11 @@ def test_nested_quotes(f):
         '{name# from global sapce}',
         "{name + 'uniquote}",
         '{name!x}',
-        pytest.param('{ord("\n")}', marks=pytest.mark.xfail(reason='fails in _cfyeah')),
-        pytest.param(
-            ''' {""" \'\'\' \'\'\' """} ''',
-            marks=pytest.mark.xfail(reason='fails in _cfyeah'),
-        ),
+        '{ord("\n")}',
+        ''' {""" \'\'\' \'\'\' """} ''',
     ],
 )
-def test_fstring_errors(f, error):
+def test_fstring_errors(error):
     with pytest.raises(SyntaxError) as why:
         f(error)
     assert 'f-string' in why.exconly()

@@ -3,16 +3,16 @@ import inspect
 
 def f(template: str) -> str:
     if not isinstance(template, str):
-        raise TypeError(f"Cannot format {type(template)}")
+        raise TypeError(f'Cannot format {type(template)}')
     parent_frame = inspect.stack()[1].frame
     # add quotes around template
-    f_template = "f" + repr(template)
+    f_template = 'f' + repr(template)
     try:
         formatted = eval(f_template, parent_frame.f_globals, parent_frame.f_locals)
     except SyntaxError:
         # wrapping template string in f triple quoted string is expensive and only
         # necessary in very unusual scenarios
-        f_template = "f" + _triple_repr(template)
+        f_template = 'f' + _triple_repr(template)
         formatted = eval(f_template, parent_frame.f_globals, parent_frame.f_locals)
     assert isinstance(formatted, str)
     return formatted
@@ -47,28 +47,28 @@ def _triple_repr(original_str):
     for exp_start, exp_end in expression_idxs:
         for idx in range(lit_end, exp_end, -1):
             if original_repr[idx] == unescaped_quote:
-                original_repr = original_repr[:idx] + "\\" + original_repr[idx:]
+                original_repr = original_repr[:idx] + '\\' + original_repr[idx:]
         single_quote_found = 0
         double_quote_found = 0
         escape_found = 0
         for idx in range(exp_end, exp_start, -1):
-            if original_repr[idx] == "\\":
+            if original_repr[idx] == '\\':
                 if not single_quote_found and not double_quote_found:
                     raise SyntaxError(
-                        "f-string expression part cannot include a backslash"
+                        'f-string expression part cannot include a backslash'
                     )
                 escape_found += 1
                 original_repr = original_repr[:idx] + original_repr[idx + 1 :]
             elif escape_found:
                 if escape_found % 2 == 0:
                     raise SyntaxError(
-                        "f-string expression part cannot include a backslash"
+                        'f-string expression part cannot include a backslash'
                     )
                 escape_found = 0
 
-            if original_repr[idx] not in ("'", "\\"):
+            if original_repr[idx] not in ("'", '\\'):
                 single_quote_found = 0
-            if original_repr[idx] not in ('"', "\\"):
+            if original_repr[idx] not in ('"', '\\'):
                 double_quote_found = 0
 
             if original_repr[idx] == "'":
@@ -82,11 +82,11 @@ def _triple_repr(original_str):
         lit_end = exp_start
     for idx in range(lit_end, 0, -1):
         if original_repr[idx] == unescaped_quote:
-            original_repr = original_repr[:idx] + "\\" + original_repr[idx:]
+            original_repr = original_repr[:idx] + '\\' + original_repr[idx:]
 
     if found_tripple_single and found_tripple_double:
         # there is no way to support both ''' and """ without backslashes
-        raise SyntaxError("f-string expression part cannot include a backslash")
+        raise SyntaxError('f-string expression part cannot include a backslash')
     elif found_tripple_single:
         original_repr = '"""' + original_repr[1:-1] + '"""'
     else:
@@ -96,17 +96,17 @@ def _triple_repr(original_str):
 
 def _find_opening_expression(string, start):
     string_len = len(string)
-    brace_idx = first_brace_idx = string.find("{", start)
+    brace_idx = first_brace_idx = string.find('{', start)
     while brace_idx >= 0:
-        while brace_idx + 1 < string_len and string[brace_idx + 1] == "{":
+        while brace_idx + 1 < string_len and string[brace_idx + 1] == '{':
             brace_idx += 1
         if (brace_idx - first_brace_idx + 1) % 2 == 0:
             # just some literal { characters
-            brace_idx = string.find("{", brace_idx)
+            brace_idx = string.find('{', brace_idx)
             continue
         break
     return brace_idx
 
 
 def _find_closing_expression(string, start):
-    return string.find("}", start)
+    return string.find('}', start)

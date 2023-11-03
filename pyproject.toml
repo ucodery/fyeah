@@ -18,6 +18,9 @@ Home = "https://github.com/ucodery/fyeah"
 [tool.setuptools]
 packages = ["fyeah"]
 
+[tool.ruff.format]
+quote-style = "single"
+
 [tool.portray.mkdocs.theme]
 name = "material"
 favicon = "art/logo.png"
