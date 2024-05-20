@@ -1,10 +1,30 @@
 import inspect
 
 
-def f(template: str) -> str:
+def lazy_f(template: str):
+    class LazyF(object):
+        def __init__(self, template: str):
+            class MyFrame(object):
+                def __init__(self, frame):
+                    self.f_globals = frame.f_globals.copy()
+                    self.f_locals = frame.f_locals.copy()
+
+            self.template = str(template)
+            # Make a copy of the relevant objects from the frame to ensure they don't go out of scope
+            self.parent_frame = MyFrame(inspect.stack()[2].frame)
+            self.str_cache = None
+        def __str__(self):
+            if self.str_cache is None:
+                self.str_cache = f(self.template, parent_frame=self.parent_frame)
+            return self.str_cache
+
+    return LazyF(template)
+
+def f(template: str, *, parent_frame=None) -> str:
     if not isinstance(template, str):
         raise TypeError(f'Cannot format {type(template)}')
-    parent_frame = inspect.stack()[1].frame
+    if parent_frame is None:
+        parent_frame = inspect.stack()[1].frame
     # add quotes around template
     f_template = 'f' + repr(template)
     try:
