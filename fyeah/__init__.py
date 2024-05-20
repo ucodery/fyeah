@@ -1,1 +1,1 @@
-from ._fyeah import f  # noqa: F401
+from ._fyeah import f, lazy_f  # noqa: F401
