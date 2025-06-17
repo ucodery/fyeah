@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "f-yeah"
-version = "0.4.0"
+version = "0.5.0"
 description = "Reusable f-strings"
 authors = [{name = "Jeremiah Paige", email = "ucodery@gmail.com"}]
 license = {file = "LICENSE.txt"}
