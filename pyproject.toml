@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "f-yeah"
-version = "0.3.0"
+version = "0.4.0"
 description = "Reusable f-strings"
 authors = [{name = "Jeremiah Paige", email = "ucodery@gmail.com"}]
 license = {file = "LICENSE.txt"}
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.6"
+requires-python = ">=3.12"
 classifiers = ["License :: OSI Approved :: BSD License"]
 
 [project.urls]

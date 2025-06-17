@@ -17,6 +17,10 @@ outside = 3.1
 # TODO: add test for quoted-dict keys (d['foo bar']) and assignment expression(f"{foo=}")
 # both are illegal in the older format() mini-language
 
+def test_debug_expr():
+    assert f('look {name=}') == "look name='foo'"
+    assert f('look {outside  = }') == 'look outside  = 3.1'
+
 
 @pytest.mark.parametrize('template', ['', 'Hello World'])
 def test_no_expressions(template):
@@ -116,7 +120,7 @@ def test_reformat_template():
 @pytest.mark.parametrize(
     'template,final', [('Hello World', 'Hello World'), ('Hello {name}', 'Hello foo')]
 )
-def test_recursive(template, final):
+def test_no_expr_itempotent(template, final):
     """Test that passing the same string, with no bracket pairs, through f produces no changes"""
     for _ in range(8):
         template = f(template)
@@ -212,13 +216,77 @@ def test_nested_formats(template, final):
     assert f(template) == final
 
 
-def test_nested_quotes():
-    # this is the deepest level of quoting that can occur in an fstring expression
-    # because backslashes are disallowed
-    assert f('''" \'\'\'{"""'" "'"""}\'\'\' "''') == '''" \'\'\'\'" "\'\'\'\' "'''
-    assert f("""' \"\"\"{'''"' '"'''}\"\"\" '""") == """' \"\"\"\"' '\"\"\"\" '"""
-    assert f('''"'{"'"''"'"}'"''') == '''"\'\'\'\'"'''
-    assert f('''"""{" \'\'\' "}"""''') == '''""" \'\'\' """'''
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        # this was the deepest level of quoting that could occur in an fstring expression
+        # because backslashes and quote release were disallowed prior to 3.12
+        ('''" \'\'\'{"""'" "'"""}\'\'\' "''', '''" \'\'\'\'" "\'\'\'\' "'''),
+        ('''"""{" \'\'\' "}"""''', '''""" \'\'\' """'''),
+        # starting with 3.12 there is no maximum quote depth
+        (''' {""" \'\'\' \'\'\' """} ''', """  ''' '''  """),
+        (''' {""" \\"\\"\\" """} ''', """  \\"\\"\\"  """),
+    ],
+)
+def test_nested_quotes(template, final):
+    assert f(template) == final
+
+
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        ("""' \"\"\"{'''"' '"'''}\"\"\" '""", """' \"\"\"\"' '\"\"\"\" '"""),
+        ('''"'{"'"''"'"}'"''', '''"\'\'\'\'"'''),
+        (''' \'\'\'{\'\'\' \' \'\'\'}\'\'\' ''', """ ''' ' ''' """),
+        ('{None\n}', 'None'),
+        ('{1\t+\t2}', '3'),
+    ],
+)
+def test_requote(template, final):
+    """These examples are known to trigger the _triple_repr fallback"""
+    assert f(template) == final
+
+
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        (''' {f" { f' { f"{'X'}" } ' } "} ''', '   X   '),
+        (''' {f" { f' { f("{'X'}") } ' } "} ''', '   X   '),
+        (''' {f(" { f' { 'X' } ' } ")} ''', '   X   '),
+        (''' {f(""" { f(" { 'X' } ") } """)} ''', '   X   '),
+    ],
+)
+def test_recursive(template, final):
+    assert f(template) == final
+
+
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        ('{ord("\n")}', '10'),
+        ('{"\t"}', '\t'),
+    ],
+)
+def test_escape(template, final):
+    assert f(template) == final
+
+
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        ('{name # nothing to see here\n }', 'foo'),
+        ('''{name # nothing to see here
+         }''',
+         'foo',
+        ),
+        ('''{(name # fake bracket }
+             * 2)}''',
+         'foofoo',
+        ),
+    ],
+)
+def test_comment(template, final):
+    assert f(template) == final
 
 
 @pytest.mark.parametrize(
@@ -230,16 +298,25 @@ def test_nested_quotes():
         'foo { bar',
         '{}',
         '{    }',
-        '{\t}',
-        '{ \\ }',
-        '{name# from global sapce}',
-        "{name + 'uniquote}",
         '{name!x}',
-        '{ord("\n")}',
-        ''' {""" \'\'\' \'\'\' """} ''',
     ],
 )
 def test_fstring_errors(error):
     with pytest.raises(SyntaxError) as why:
         f(error)
     assert 'f-string' in why.exconly()
+
+
+@pytest.mark.parametrize(
+    'error',
+    [
+        '{pass}',
+        '{\t}',
+        '{ \\ }',
+        '{name# from global space}',
+        "{name + 'uniquote}",
+    ],
+)
+def test_fstring_expr_errors(error):
+    with pytest.raises(SyntaxError):
+        f(error)

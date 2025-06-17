@@ -45,7 +45,7 @@ def pow(value):
     assert isinstance(value, int), bad_check.format(value=value)
     return value ** value
 ```
-Just write the template once to get consistent strings that stay in sync.
+You can write the template once to get consistent strings that stay in sync.
 ```python
 from fyeah import f
 bad_check = 'Expected value to be an integer, got {type(value)} instead'
