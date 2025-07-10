@@ -1,7 +1,7 @@
 import nox
 
 
-@nox.session(python=['3.13'])
+@nox.session(python=['3.14'])
 def unittest(session):
     session.install('.')
     session.install('pytest')

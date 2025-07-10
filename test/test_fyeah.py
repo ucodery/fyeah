@@ -14,9 +14,6 @@ name = 'foo'
 outside = 3.1
 
 
-# TODO: add test for quoted-dict keys (d['foo bar']) and assignment expression(f"{foo=}")
-# both are illegal in the older format() mini-language
-
 def test_debug_expr():
     assert f('look {name=}') == "look name='foo'"
     assert f('look {outside  = }') == 'look outside  = 3.1'
@@ -320,3 +317,15 @@ def test_fstring_errors(error):
 def test_fstring_expr_errors(error):
     with pytest.raises(SyntaxError):
         f(error)
+
+
+@pytest.mark.parametrize(
+    'template,final',
+    [
+        ("unlock {d['key']}", 'unlock door'),
+        ("debug {d=}", "debug d={'key': 'door'}"),
+    ]
+)
+def test_not_in_format(template, final):
+    d = {'key': 'door'}
+    assert f(template) == final
